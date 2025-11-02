@@ -31,7 +31,8 @@ To install and run the Void CLI, follow these steps. This process works on Windo
 4.  Install the necessary dependencies:
    ```bash
     npm install
-   ```
+
+ ```
 
 5.  Create the global `void` command:
     This command creates a symbolic link from your system's command path to the application, allowing you to run it from anywhere.
