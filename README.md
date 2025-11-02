@@ -12,22 +12,28 @@ Before you begin, ensure you have the following installed on your system:
 
 To install and run the Void CLI, follow these steps. This process works on Windows, macOS, and Linux.
 
-1.  **Clone the repository:**
+1. Clone the repository:**
     ```bash
     git clone https://github.com/hashfydr/void-CLI.git
     ```
 
-2.  **Navigate into the project directory:**
+2. Navigate into the project directory:**
     ```bash
-    cd void-cli
+    cd void-CLI
     ```
 
-3.  **Install the necessary dependencies:**
-    ```bash
+3. Set Permissions (for macOS and Linux only):
+      If you are on macOS or Linux, you need to make the main script executable. Windows users can skip this step.
+      ```bash
+      chmod +x index.js
+       ```
+
+5.  Install the necessary dependencies:
+   ```bash
     npm install
     ```
 
-4.  **Create the global `void` command:**
+6.  Create the global `void` command:
     This command creates a symbolic link from your system's command path to the application, allowing you to run it from anywhere.
     ```bash
     npm link
