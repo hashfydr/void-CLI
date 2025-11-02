@@ -26,7 +26,7 @@ To install and run the Void CLI, follow these steps. This process works on Windo
       If you are on macOS or Linux, you need to make the main script executable. Windows users can skip this step.
       ```bash
       chmod +x index.js
-       ```
+      
 
 4.  Install the necessary dependencies:
    ```bash
