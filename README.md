@@ -14,8 +14,7 @@ To install and run the Void CLI, follow these steps. This process works on Windo
 
 1.  **Clone the repository:**
     ```bash
-    # Replace <your-github-repo-url> with the actual URL of your repository
-    git clone <your-github-repo-url>
+    git clone https://github.com/hashfydr/void-CLI.git
     ```
 
 2.  **Navigate into the project directory:**
