@@ -8,9 +8,6 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isThaparUser() {
-      return isAuthenticated() && request.auth.token.email.matches('.*@thapar\\.edu$');
-    }
 
     function isOwner(authorField) {
       return isAuthenticated() && request.auth.uid == resource.data[authorField];
@@ -30,7 +27,6 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAuthenticated()
                     && request.auth.uid == userId
-                    && isThaparUser()
                     && request.resource.data.keys().hasAll(['email', 'uid', 'username'])
                     && request.resource.data.uid == request.auth.uid
                     && request.resource.data.email == request.auth.token.email;
@@ -40,9 +36,9 @@ service cloud.firestore {
 
     // ─── Posts Collection ───────────────────────────────────────
     match /posts/{postId} {
-      // Only verified Thapar users can read and create posts
-      allow read: if isThaparUser() && isVerified();
-      allow create: if isThaparUser()
+      // Only verified users can read and create posts
+      allow read: if isAuthenticated() && isVerified();
+      allow create: if isAuthenticated()
                     && isVerified()
                     && request.resource.data.keys().hasAll(['content', 'createdAt', 'author', 'username'])
                     && request.resource.data.author == request.auth.uid
@@ -56,8 +52,8 @@ service cloud.firestore {
 
     // ─── Messages Collection (Chatroom) ─────────────────────────
     match /messages/{messageId} {
-      allow read: if isThaparUser() && isVerified();
-      allow create: if isThaparUser()
+      allow read: if isAuthenticated() && isVerified();
+      allow create: if isAuthenticated()
                     && isVerified()
                     && request.resource.data.keys().hasAll(['text', 'createdAt', 'authorId', 'authorUsername'])
                     && request.resource.data.authorId == request.auth.uid
@@ -71,8 +67,8 @@ service cloud.firestore {
 
     // ─── Comments Collection ────────────────────────────────────
     match /comments/{commentId} {
-      allow read: if isThaparUser() && isVerified();
-      allow create: if isThaparUser()
+      allow read: if isAuthenticated() && isVerified();
+      allow create: if isAuthenticated()
                     && isVerified()
                     && request.resource.data.keys().hasAll(['postId', 'text', 'createdAt', 'authorId', 'authorUsername'])
                     && request.resource.data.authorId == request.auth.uid

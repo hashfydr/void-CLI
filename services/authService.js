@@ -42,9 +42,6 @@ export const resendVerification = async (user) => {
 };
 
 export const signupUser = async (email, password, username) => {
-    if (!email.endsWith('@thapar.edu')) {
-        throw new Error('Only @thapar.edu emails are allowed.');
-    }
 
     const isUnique = await isUsernameUnique(username);
     if (!isUnique) {
