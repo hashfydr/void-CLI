@@ -42,11 +42,11 @@ To ensure this app scales without burning through Firebase quotas, Void implemen
 ## Screenshots
 
 <p align="center">
-  <img src="1.png" alt="Screenshot 1" width="100%">
-  <img src="2.png" alt="Screenshot 2" width="100%">
-  <img src="3.png" alt="Screenshot 3" width="100%">
-  <img src="4.png" alt="Screenshot 4" width="100%">
-  <img src="5.png" alt="Screenshot 5" width="100%">
+  <img src="assets/1.png" alt="Screenshot 1" width="100%">
+  <img src="assets/2.png" alt="Screenshot 2" width="100%">
+  <img src="assets/3.png" alt="Screenshot 3" width="100%">
+  <img src="assets/4.png" alt="Screenshot 4" width="100%">
+  <img src="assets/5.png" alt="Screenshot 5" width="100%">
 </p>
 
 ---
