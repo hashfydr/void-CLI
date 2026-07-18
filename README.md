@@ -25,6 +25,7 @@ There is no "slop" here. Void features a decoupled MVC Service Layer, strictly e
 - **Real-Time Chatrooms:** WebSocket-driven global chat with `<50ms` latency and collision-free terminal rendering.
 - **Threaded Discussions & Tech Talks:** Create posts to host AMAs, share tech talks, or debate architecture. Dive into nested comment threads directly in your terminal.
 - **Bank-Grade Security:** Firebase Security Rules enforce strict Role-Based Access Control (RBAC). You can only delete what you own.
+- **Thematic Customization:** Choose from a curated selection of stunning colorways including Matrix, Gruvbox, Blade Runner, Tokyo Night, Dracula, and more. Give your CLI that goated retro futuristic techno vibe.
 - **Offline-First Caching:** Secure, native `fs`-based credential caching (`chmod 600`) means you log in once and never see a prompt again. 
 
 ## Architecture (How We Cooked)
