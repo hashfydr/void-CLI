@@ -1,4 +1,4 @@
-# 🌌 Void CLI
+# Void CLI
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node-v18+-green.svg)](https://nodejs.org/)
@@ -13,21 +13,21 @@ Whether you want to drop a hot take on the latest JS framework, coordinate a tec
 
 ---
 
-## 🚀 Why Void? (The Mission)
+## Why Void? (The Mission)
 
 We've all seen the recent wave of "vibe-coded" AI projects that look cool on Twitter but instantly break in production. Void is different. While AI was utilized to accelerate the boilerplate, **Void is rigorously architected, manually optimized, and production-hardened.**
 
 There is no "slop" here. Void features a decoupled MVC Service Layer, strictly enforced Firebase Security Rules, cursor-based pagination that prevents N+1 query bottlenecks, and POSIX-compliant offline credential caching. It's a serious engineering project disguised as a fun CLI app. No cap.
 
-## ✨ Features (The W's)
+## Features (The W's)
 
-- **🌍 Global Access & Cross-Platform:** Works flawlessly on Linux, macOS, and Windows. Bring your own email address—no domain restrictions.
-- **⚡ Real-Time Chatrooms:** WebSocket-driven global chat with `<50ms` latency and collision-free terminal rendering.
-- **🗣️ Threaded Discussions & Tech Talks:** Create posts to host AMAs, share tech talks, or debate architecture. Dive into nested comment threads directly in your terminal.
-- **🔒 Bank-Grade Security:** Firebase Security Rules enforce strict Role-Based Access Control (RBAC). You can only delete what you own.
-- **💾 Offline-First Caching:** Secure, native `fs`-based credential caching (`chmod 600`) means you log in once and never see a prompt again. 
+- **Global Access & Cross-Platform:** Works flawlessly on Linux, macOS, and Windows. Bring your own email address—no domain restrictions.
+- **Real-Time Chatrooms:** WebSocket-driven global chat with `<50ms` latency and collision-free terminal rendering.
+- **Threaded Discussions & Tech Talks:** Create posts to host AMAs, share tech talks, or debate architecture. Dive into nested comment threads directly in your terminal.
+- **Bank-Grade Security:** Firebase Security Rules enforce strict Role-Based Access Control (RBAC). You can only delete what you own.
+- **Offline-First Caching:** Secure, native `fs`-based credential caching (`chmod 600`) means you log in once and never see a prompt again. 
 
-## 🛠️ Architecture (How We Cooked)
+## Architecture (How We Cooked)
 
 To ensure this app scales without burning through Firebase quotas, Void implements:
 1. **Service Layer Pattern:** Terminal UI logic (`inquirer`, `chalk`, `ora`) is completely decoupled from database queries (`firebase`), ensuring a clean separation of concerns.
@@ -36,7 +36,7 @@ To ensure this app scales without burning through Firebase quotas, Void implemen
 
 ---
 
-## 💻 Getting Started
+## Getting Started
 
 You're just 3 commands away from main character energy.
 
@@ -72,7 +72,7 @@ You're just 3 commands away from main character energy.
    ```
    *(Windows automatically handles the executable wrappers, massive W).*
 
-## 🎮 Usage
+## Usage
 
 Once installed, just open your terminal from *anywhere* on your OS and type:
 
@@ -84,10 +84,10 @@ Use your arrow keys to navigate the interactive menus. Press `Enter` to select. 
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Found a bug? Want to add direct messaging? We welcome pull requests! See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup instructions. Let's build the ultimate developer hangout spot.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
