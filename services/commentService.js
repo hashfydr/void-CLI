@@ -39,3 +39,8 @@ export const subscribeToComments = (postId, callback) => {
     const liveQuery = query(collection(db, 'comments'), where('postId', '==', postId));
     return onSnapshot(liveQuery, callback);
 };
+
+export const deleteComment = async (commentId) => {
+    const { deleteDoc } = await import('firebase/firestore');
+    await deleteDoc(doc(db, 'comments', commentId));
+};

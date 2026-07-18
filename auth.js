@@ -1,33 +1,28 @@
 import { loginUser, signupUser, isUsernameUnique, resendVerification, logoutUser } from './services/authService.js';
+import { auth } from './firebase.js';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import ora from 'ora';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
 
 export { isUsernameUnique };
 
-const AUTH_FILE = path.join(os.homedir(), '.void-cli-auth.json');
+export const getAutoLoginState = () => {
+    return new Promise((resolve) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            unsubscribe();
+            resolve(user);
+        });
+    });
+};
 
 export const login = async (loginIdentifier, password, silent = false) => {
     const spinner = silent ? null : ora('Logging in...').start();
     try {
         await loginUser(loginIdentifier, password);
         if (spinner) spinner.succeed(chalk.green('Login successful!'));
-        
-        // Save auth data
-        const authData = {
-            loginIdentifier,
-            password: Buffer.from(password).toString('base64')
-        };
-        fs.writeFileSync(AUTH_FILE, JSON.stringify(authData), { mode: 0o600 });
         return true;
     } catch (error) {
         if (spinner) spinner.fail(chalk.red('Login failed: ' + error.message));
-        if (fs.existsSync(AUTH_FILE)) {
-            fs.unlinkSync(AUTH_FILE);
-        }
         if (error.code === 'auth/email-unverified' && !silent) {
             const { resend } = await inquirer.prompt([
                 {
@@ -70,9 +65,6 @@ export const logout = async () => {
     const spinner = ora('Logging out...').start();
     try {
         await logoutUser();
-        if (fs.existsSync(AUTH_FILE)) {
-            fs.unlinkSync(AUTH_FILE);
-        }
         spinner.succeed(chalk.green('Logged out successfully!'));
     } catch (error) {
         spinner.fail(chalk.red('Logout failed: ' + error.message));

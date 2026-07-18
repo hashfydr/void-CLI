@@ -20,6 +20,10 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.token.email_verified == true;
     }
 
+    function isModerator() {
+      return isAuthenticated() && request.auth.token.email == 'hgarg1_be24@thapar.edu';
+    }
+
     // ─── Users Collection ───────────────────────────────────────
     match /users/{userId} {
       // Users can only read their own profile; create only their own doc
@@ -45,9 +49,9 @@ service cloud.firestore {
                     && request.resource.data.content is string
                     && request.resource.data.content.size() > 0
                     && request.resource.data.content.size() <= 2000;
-      // Only the original author can update or delete their own posts
+      // Only the original author can update their own posts
       allow update: if isOwner('author');
-      allow delete: if isOwner('author');
+      allow delete: if isOwner('author') || isModerator();
     }
 
     // ─── Messages Collection (Chatroom) ─────────────────────────
@@ -60,9 +64,9 @@ service cloud.firestore {
                     && request.resource.data.text is string
                     && request.resource.data.text.size() > 0
                     && request.resource.data.text.size() <= 1000;
-      // Only the original author can update or delete their own messages
+      // Only the original author can update their own messages
       allow update: if isOwner('authorId');
-      allow delete: if isOwner('authorId');
+      allow delete: if isOwner('authorId') || isModerator();
     }
 
     // ─── Comments Collection ────────────────────────────────────
@@ -75,9 +79,9 @@ service cloud.firestore {
                     && request.resource.data.text is string
                     && request.resource.data.text.size() > 0
                     && request.resource.data.text.size() <= 1000;
-      // Only the original author can update or delete their own comments
+      // Only the original author can update their own comments
       allow update: if isOwner('authorId');
-      allow delete: if isOwner('authorId');
+      allow delete: if isOwner('authorId') || isModerator();
     }
 
     // ─── Deny everything else by default ────────────────────────

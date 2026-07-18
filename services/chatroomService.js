@@ -50,6 +50,11 @@ export const subscribeToMessages = (callback) => {
     return onSnapshot(liveQuery, callback);
 };
 
+export const deleteMessage = async (messageId) => {
+    const { deleteDoc } = await import('firebase/firestore');
+    await deleteDoc(doc(db, 'messages', messageId));
+};
+
 export const getCurrentUserId = () => {
     return auth.currentUser?.uid;
 };

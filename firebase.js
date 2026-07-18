@@ -1,6 +1,6 @@
 // Import Firebase SDK
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeAuth, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getDatabase } from 'firebase/database';
 
@@ -20,8 +20,19 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+import { LocalStorage } from 'node-localstorage';
+import os from 'os';
+import path from 'path';
+
+// Polyfill localStorage for Firebase Auth Persistence in Node.js
+if (typeof global.localStorage === 'undefined' || global.localStorage === null) {
+    global.localStorage = new LocalStorage(path.join(os.homedir(), '.void-cli-auth'));
+}
+
 // Initialize services
-export const auth = getAuth(app);
+export const auth = initializeAuth(app, {
+    persistence: browserLocalPersistence
+});
 export const db = getFirestore(app);
 export const rtdb = getDatabase(app);
 

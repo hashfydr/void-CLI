@@ -12,3 +12,8 @@ export const submitPost = async (content) => {
         username: username,
     });
 };
+
+export const deletePost = async (postId) => {
+    const { deleteDoc } = await import('firebase/firestore');
+    await deleteDoc(doc(db, 'posts', postId));
+};

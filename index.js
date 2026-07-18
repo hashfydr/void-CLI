@@ -3,17 +3,12 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora';
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
-import { login, signup, isUsernameUnique, logout } from './auth.js';
+import { login, signup, isUsernameUnique, logout, getAutoLoginState } from './auth.js';
 import { getFeed, getPosts } from './feed.js';
 import { createPost } from './post.js';
 import { enterCommentSession } from './comment.js';
 import { enterChatroom } from './chatroom.js';
 import { auth } from './firebase.js';
-
-const AUTH_FILE = path.join(os.homedir(), '.void-cli-auth.json');
 
 const displayAsciiArt = () => {
     console.log(
@@ -29,7 +24,7 @@ const displayAsciiArt = () => {
 };
 
 const loggedInMenu = async () => {
-    const choices = ['View Feed', 'Create Post', 'View/Discuss Post Comments', 'Chatroom', 'Logout', 'Exit'];
+    const choices = ['View Feed', 'Create Post', 'Delete Post', 'View/Discuss Post Comments', 'Chatroom', 'Logout', 'Exit'];
 
     while (true) {
         const { choice } = await inquirer.prompt([
@@ -57,6 +52,48 @@ const loggedInMenu = async () => {
                     },
                 ]);
                 await createPost(content);
+                break;
+            }
+
+            case 'Delete Post': {
+                const postsSpinner = ora('Fetching posts...').start();
+                const posts = await getPosts();
+                
+                // Filter posts that the user is allowed to delete
+                const isModerator = auth.currentUser?.email === 'hgarg1_be24@thapar.edu';
+                const deletablePosts = posts.filter(p => isModerator || p.author === auth.currentUser.uid);
+                
+                if (deletablePosts.length === 0) {
+                    postsSpinner.info(chalk.yellow('You do not have any posts to delete.'));
+                    break;
+                }
+                postsSpinner.stop();
+                
+                const deleteChoices = deletablePosts.map((post, i) => ({
+                    name: `${i + 1}. [${post.username}] ${post.content.substring(0, 50)}...`,
+                    value: post.id,
+                }));
+                deleteChoices.push({ name: 'Cancel', value: 'cancel' });
+                
+                const { postId } = await inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'postId',
+                        message: 'Which post do you want to delete?',
+                        choices: deleteChoices,
+                    },
+                ]);
+                
+                if (postId !== 'cancel') {
+                    const delSpinner = ora('Deleting post...').start();
+                    try {
+                        const { deletePost } = await import('./services/postService.js');
+                        await deletePost(postId);
+                        delSpinner.succeed(chalk.green('Post deleted successfully.'));
+                    } catch (err) {
+                        delSpinner.fail(chalk.red('Failed to delete post: ' + err.message));
+                    }
+                }
                 break;
             }
 
@@ -225,18 +262,10 @@ const startMenu = async () => {
 };
 
 const autoLogin = async () => {
-    if (fs.existsSync(AUTH_FILE)) {
-        try {
-            const data = JSON.parse(fs.readFileSync(AUTH_FILE, 'utf8'));
-            const password = Buffer.from(data.password, 'base64').toString('utf8');
-            console.log(chalk.cyan(`Found saved session for ${data.loginIdentifier}. Logging in automatically...`));
-            const success = await login(data.loginIdentifier, password, true);
-            if (success && auth.currentUser && auth.currentUser.emailVerified) {
-                return true;
-            }
-        } catch (err) {
-            if (fs.existsSync(AUTH_FILE)) fs.unlinkSync(AUTH_FILE);
-        }
+    const user = await getAutoLoginState();
+    if (user && user.emailVerified) {
+        console.log(chalk.cyan(`Found saved session for ${user.email}. Logging in automatically...`));
+        return true;
     }
     return false;
 };
