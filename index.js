@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+import './polyfill.js';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora';

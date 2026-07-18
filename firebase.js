@@ -19,14 +19,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-import { LocalStorage } from 'node-localstorage';
-import os from 'os';
-import path from 'path';
-
-// Polyfill localStorage for Firebase Auth Persistence in Node.js
-if (typeof global.localStorage === 'undefined' || global.localStorage === null) {
-    global.localStorage = new LocalStorage(path.join(os.homedir(), '.void-cli-auth'));
-}
 
 // Initialize services
 export const auth = initializeAuth(app, {
