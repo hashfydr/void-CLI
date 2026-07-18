@@ -1,4 +1,4 @@
-# Grid CLI
+# Void CLI
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node-v18+-green.svg)](https://nodejs.org/)
@@ -8,17 +8,17 @@
 > **"Terminal-native social networking for developers who refuse to leave their IDE."**
 
 
-Grid is a blazing-fast, terminal-based social platform built for developers, hackers, and tech enthusiasts. Born out of Thapar University (yes, `@thapar.edu` mains we see you) but now **globally open to everyone**, Grid brings the entire social experience directly into your command line.
+Void is a blazing-fast, terminal-based social platform built for developers, hackers, and tech enthusiasts. Born out of Thapar University (yes, `@thapar.edu` mains we see you) but now **globally open to everyone**, Void brings the entire social experience directly into your command line.
 
-Whether you want to drop a hot take on the latest JS framework, coordinate a tech talk, debate systems architecture, or just vibe in the global chatroom instead of touching grass, Grid is your home. 
+Whether you want to drop a hot take on the latest JS framework, coordinate a tech talk, debate systems architecture, or just vibe in the global chatroom instead of touching grass, Void is your home. 
 
 ---
 
-## Why Grid? (The Mission)
+## Why Void? (The Mission)
 
-We've all seen the recent wave of "vibe-coded" AI projects that look cool on Twitter but instantly break in production. Grid is different. While AI was utilized to accelerate the boilerplate, **Grid is rigorously architected, manually optimized, and production-hardened.**
+We've all seen the recent wave of "vibe-coded" AI projects that look cool on Twitter but instantly break in production. Void is different. While AI was utilized to accelerate the boilerplate, **Void is rigorously architected, manually optimized, and production-hardened.**
 
-There is no "slop" here. Grid features a decoupled MVC Service Layer, strictly enforced Firebase Security Rules, cursor-based pagination that prevents N+1 query bottlenecks, and POSIX-compliant offline credential caching. It's a serious engineering project disguised as a fun CLI app. No cap.
+There is no "slop" here. Void features a decoupled MVC Service Layer, strictly enforced Firebase Security Rules, cursor-based pagination that prevents N+1 query bottlenecks, and POSIX-compliant offline credential caching. It's a serious engineering project disguised as a fun CLI app. No cap.
 
 ## Features (The W's)
 
@@ -32,7 +32,7 @@ There is no "slop" here. Grid features a decoupled MVC Service Layer, strictly e
 
 ## Architecture (How We Cooked)
 
-To ensure this app scales without burning through Firebase quotas, Grid implements:
+To ensure this app scales without burning through Firebase quotas, Void implements:
 1. **Service Layer Pattern:** Terminal UI logic (`inquirer`, `chalk`, `ora`) is completely decoupled from database queries (`firebase`), ensuring a clean separation of concerns.
 2. **Cursor-Based Pagination:** Instead of fetching the entire database, feeds and chatrooms load up to 5,000 messages dynamically in optimized chunks.
 3. **Parallelized Fetching:** Comments and metadata are fetched using `Promise.all` to completely eliminate N+1 query latency.
@@ -63,8 +63,8 @@ You're just 3 commands away from main character energy.
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/hashfydr/grid-CLI.git
-   cd grid-CLI
+   git clone https://github.com/hashfydr/void-CLI.git
+   cd void-CLI
    ```
 
 2. **Install dependencies:**
@@ -92,7 +92,7 @@ You're just 3 commands away from main character energy.
 Once installed, just open your terminal from *anywhere* on your OS and type:
 
 ```bash
-grid
+void
 ```
 
 Use your arrow keys to navigate the interactive menus. Press `Enter` to select. To cleanly exit a chatroom, simply type `:q` or hit `Ctrl+C`.
