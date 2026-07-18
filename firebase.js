@@ -2,7 +2,6 @@
 import { initializeApp } from 'firebase/app';
 import { initializeAuth, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { getDatabase } from 'firebase/database';
 
 // Your Firebase configuration
 // These are public client keys. Security is enforced via Firestore Rules.
@@ -34,6 +33,5 @@ export const auth = initializeAuth(app, {
     persistence: browserLocalPersistence
 });
 export const db = getFirestore(app);
-export const rtdb = getDatabase(app);
 
 export default app;

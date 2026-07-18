@@ -11,8 +11,7 @@ import {
     getDoc,
     startAfter,
 } from 'firebase/firestore';
-import { ref, onValue } from 'firebase/database';
-import { db, auth, rtdb } from '../firebase.js';
+import { db, auth } from '../firebase.js';
 
 export const fetchInitialMessages = async (limitCount = 10) => {
     const initialQuery = query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(limitCount));
@@ -69,15 +68,8 @@ export const getCurrentUserId = () => {
  * The `.info/connected` path is free and built-in.
  */
 export const subscribeToConnectionState = (callback) => {
-    try {
-        const connectedRef = ref(rtdb, '.info/connected');
-        const unsub = onValue(connectedRef, (snapshot) => {
-            callback(snapshot.val() === true);
-        });
-        return unsub;
-    } catch {
-        // If Realtime Database is not configured, fall back to a no-op.
-        // The app will still work; it just won't show online/offline indicators.
-        return () => {};
-    }
+    // If Realtime Database is not configured, we mock the connection state to true.
+    // Firestore handles its own connection/offline caching internally.
+    callback(true);
+    return () => {};
 };
