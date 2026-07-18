@@ -15,18 +15,25 @@ export const getFeed = async () => {
             return;
         }
 
+        // Fetch comments for all posts in parallel
+        const postsWithComments = await Promise.all(
+            posts.map(async (post) => {
+                const comments = await fetchComments(post.id);
+                return { ...post, comments };
+            })
+        );
+
         spinner.succeed('Feed loaded.');
 
-        for (const post of posts) {
+        for (const post of postsWithComments) {
             const username = post.username || 'Anonymous';
             const time = post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleString() : 'No timestamp';
 
             console.log(`${chalk.yellow(username)} - ${chalk.cyan(time)}\n${chalk.white(post.content)}\n`);
 
-            const comments = await fetchComments(post.id);
-            if (comments.length > 0) {
+            if (post.comments.length > 0) {
                 console.log(chalk.gray('  Comments:'));
-                comments.forEach((comment) => {
+                post.comments.forEach((comment) => {
                     console.log(`    ${chalk.blue(comment.authorUsername || 'Anonymous')}: ${comment.text}`);
                 });
                 console.log('');
