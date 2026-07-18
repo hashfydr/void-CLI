@@ -1,0 +1,88 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ───────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isThaparUser() {
+      return isAuthenticated() && request.auth.token.email.matches('.*@thapar\\.edu$');
+    }
+
+    function isOwner(authorField) {
+      return isAuthenticated() && request.auth.uid == resource.data[authorField];
+    }
+
+    function isVerified() {
+      return isAuthenticated() && request.auth.token.email_verified == true;
+    }
+
+    // ─── Users Collection ───────────────────────────────────────
+    match /users/{userId} {
+      // Users can only read their own profile; create only their own doc
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated()
+                    && request.auth.uid == userId
+                    && isThaparUser()
+                    && request.resource.data.keys().hasAll(['email', 'uid', 'username'])
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.email == request.auth.token.email;
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if false; // Users cannot delete their profiles
+    }
+
+    // ─── Posts Collection ───────────────────────────────────────
+    match /posts/{postId} {
+      // Only verified Thapar users can read and create posts
+      allow read: if isThaparUser() && isVerified();
+      allow create: if isThaparUser()
+                    && isVerified()
+                    && request.resource.data.keys().hasAll(['content', 'createdAt', 'author', 'username'])
+                    && request.resource.data.author == request.auth.uid
+                    && request.resource.data.content is string
+                    && request.resource.data.content.size() > 0
+                    && request.resource.data.content.size() <= 2000;
+      // Only the original author can update or delete their own posts
+      allow update: if isOwner('author');
+      allow delete: if isOwner('author');
+    }
+
+    // ─── Messages Collection (Chatroom) ─────────────────────────
+    match /messages/{messageId} {
+      allow read: if isThaparUser() && isVerified();
+      allow create: if isThaparUser()
+                    && isVerified()
+                    && request.resource.data.keys().hasAll(['text', 'createdAt', 'authorId', 'authorUsername'])
+                    && request.resource.data.authorId == request.auth.uid
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() > 0
+                    && request.resource.data.text.size() <= 1000;
+      // Only the original author can update or delete their own messages
+      allow update: if isOwner('authorId');
+      allow delete: if isOwner('authorId');
+    }
+
+    // ─── Comments Collection ────────────────────────────────────
+    match /comments/{commentId} {
+      allow read: if isThaparUser() && isVerified();
+      allow create: if isThaparUser()
+                    && isVerified()
+                    && request.resource.data.keys().hasAll(['postId', 'text', 'createdAt', 'authorId', 'authorUsername'])
+                    && request.resource.data.authorId == request.auth.uid
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() > 0
+                    && request.resource.data.text.size() <= 1000;
+      // Only the original author can update or delete their own comments
+      allow update: if isOwner('authorId');
+      allow delete: if isOwner('authorId');
+    }
+
+    // ─── Deny everything else by default ────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
