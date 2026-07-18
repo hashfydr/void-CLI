@@ -13,9 +13,14 @@ if (typeof global.sessionStorage === 'undefined' || global.sessionStorage === nu
 if (typeof global.window === 'undefined') {
     global.window = {
         localStorage: global.localStorage,
-        sessionStorage: global.sessionStorage
+        sessionStorage: global.sessionStorage,
+        addEventListener: () => {},
+        removeEventListener: () => {}
     };
 }
 if (typeof global.document === 'undefined') {
-    global.document = {};
+    global.document = {
+        addEventListener: () => {},
+        removeEventListener: () => {}
+    };
 }
