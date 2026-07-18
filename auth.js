@@ -1,7 +1,7 @@
 import { loginUser, signupUser, isUsernameUnique, resendVerification, logoutUser } from './services/authService.js';
 import { auth } from './firebase.js';
-import chalk from 'chalk';
-import inquirer from 'inquirer';
+import { theme } from './utils/theme.js';
+import { prompt } from './utils/prompt.js';
 import ora from 'ora';
 
 export { isUsernameUnique };
@@ -30,17 +30,17 @@ export const getAutoLoginState = async () => {
 };
 
 export const login = async (loginIdentifier, password, silent = false) => {
-    const spinner = silent ? null : ora('Logging in...').start();
+    const spinner = silent ? null : ora(theme.text('Logging in...')).start();
     try {
         await loginUser(loginIdentifier, password);
         // Save credentials securely with 0600 permissions (only owner can read/write)
         fs.writeFileSync(credentialsPath, JSON.stringify({ identifier: loginIdentifier, password }), { mode: 0o600 });
-        if (spinner) spinner.succeed(chalk.green('Login successful!'));
+        if (spinner) spinner.succeed(theme.success('Login successful!'));
         return true;
     } catch (error) {
-        if (spinner) spinner.fail(chalk.red('Login failed: ' + error.message));
+        if (spinner) spinner.fail(theme.error('Login failed: ' + error.message));
         if (error.code === 'auth/email-unverified' && !silent) {
-            const { resend } = await inquirer.prompt([
+            const { resend } = await prompt([
                 {
                     type: 'confirm',
                     name: 'resend',
@@ -49,12 +49,12 @@ export const login = async (loginIdentifier, password, silent = false) => {
                 },
             ]);
             if (resend) {
-                const resendSpinner = ora('Sending verification email...').start();
+                const resendSpinner = ora(theme.text('Sending verification email...')).start();
                 try {
                     await resendVerification(error.user);
-                    resendSpinner.succeed(chalk.green('Verification email sent! Please check your inbox.'));
+                    resendSpinner.succeed(theme.success('Verification email sent! Please check your inbox.'));
                 } catch (resendError) {
-                    resendSpinner.fail(chalk.red('Failed to send verification email: ' + resendError.message));
+                    resendSpinner.fail(theme.error('Failed to send verification email: ' + resendError.message));
                 }
             }
             await logoutUser();
@@ -64,28 +64,28 @@ export const login = async (loginIdentifier, password, silent = false) => {
 };
 
 export const signup = async (email, password, username) => {
-    const spinner = ora('Creating account...').start();
+    const spinner = ora(theme.text('Creating account...')).start();
     try {
         await signupUser(email, password, username);
         spinner.succeed(
-            chalk.green(
+            theme.success(
                 'Signup successful! Please check your email to verify your account (Tip: Check your spam folder!).',
             ),
         );
     } catch (error) {
-        spinner.fail(chalk.red('Signup failed: ' + error.message));
+        spinner.fail(theme.error('Signup failed: ' + error.message));
     }
 };
 
 export const logout = async () => {
-    const spinner = ora('Logging out...').start();
+    const spinner = ora(theme.text('Logging out...')).start();
     try {
         await logoutUser();
         if (fs.existsSync(credentialsPath)) {
             fs.unlinkSync(credentialsPath);
         }
-        spinner.succeed(chalk.green('Logged out successfully!'));
+        spinner.succeed(theme.success('Logged out successfully!'));
     } catch (error) {
-        spinner.fail(chalk.red('Logout failed: ' + error.message));
+        spinner.fail(theme.error('Logout failed: ' + error.message));
     }
 };

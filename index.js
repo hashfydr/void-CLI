@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-import inquirer from 'inquirer';
-import chalk from 'chalk';
+import { prompt } from './utils/prompt.js';
+
 import ora from 'ora';
+import { theme, getAvailableThemes, setTheme, applyGlobalTheme, resetGlobalTheme } from './utils/theme.js';
 import { login, signup, isUsernameUnique, logout, getAutoLoginState } from './auth.js';
 import { getFeed, getPosts } from './feed.js';
 import { createPost } from './post.js';
@@ -12,7 +13,7 @@ import { auth } from './firebase.js';
 
 const displayAsciiArt = () => {
     console.log(
-        chalk.green(`
+        theme.primary(`
     ██╗   ██╗ ██████╗ ██╗██████╗ 
     ██║   ██║██╔═══██╗██║██╔══██╗
     ██║   ██║██║   ██║██║██║  ██║
@@ -23,19 +24,32 @@ const displayAsciiArt = () => {
     );
 };
 
+// Register cleanup handlers to reset the terminal background when the CLI exits
+process.on('exit', () => {
+    resetGlobalTheme();
+});
+process.on('SIGINT', () => {
+    resetGlobalTheme();
+    process.exit(0);
+});
+
+// Apply the global background theme right away on startup
+applyGlobalTheme();
+
 const loggedInMenu = async () => {
-    const choices = ['View Feed', 'Create Post', 'Delete Post', 'View/Discuss Post Comments', 'Chatroom', 'Logout', 'Exit'];
+    const choices = ['View Feed', 'Create Post', 'Delete Post', 'View/Discuss Post Comments', 'Chatroom', 'Theme Settings', 'Logout', 'Exit'];
 
     while (true) {
-        const { choice } = await inquirer.prompt([
+        const { choice } = await prompt([
             {
-                type: 'input',
+                type: 'list',
                 name: 'choice',
-                message: `What do you want to do?\n${choices.map((c, i) => `  ${i + 1}. ${c}`).join('\n')}\n> `,
+                message: 'What do you want to do?',
+                choices: choices,
             },
         ]);
 
-        const selectedChoice = choices[parseInt(choice, 10) - 1] || '';
+        const selectedChoice = choice;
 
         switch (selectedChoice) {
             case 'View Feed': {
@@ -44,7 +58,7 @@ const loggedInMenu = async () => {
             }
 
             case 'Create Post': {
-                const { content } = await inquirer.prompt([
+                const { content } = await prompt([
                     {
                         type: 'input',
                         name: 'content',
@@ -57,7 +71,7 @@ const loggedInMenu = async () => {
             }
 
             case 'Delete Post': {
-                const postsSpinner = ora('Fetching posts...').start();
+                const postsSpinner = ora(theme.text('Fetching posts...')).start();
                 const posts = await getPosts();
                 
                 // Filter posts that the user is allowed to delete
@@ -65,7 +79,7 @@ const loggedInMenu = async () => {
                 const deletablePosts = posts.filter(p => isModerator || p.author === auth.currentUser.uid);
                 
                 if (deletablePosts.length === 0) {
-                    postsSpinner.info(chalk.yellow('You do not have any posts to delete.'));
+                    postsSpinner.info(theme.secondary('You do not have any posts to delete.'));
                     break;
                 }
                 postsSpinner.stop();
@@ -76,7 +90,7 @@ const loggedInMenu = async () => {
                 }));
                 deleteChoices.push({ name: 'Cancel', value: 'cancel' });
                 
-                const { postId } = await inquirer.prompt([
+                const { postId } = await prompt([
                     {
                         type: 'list',
                         name: 'postId',
@@ -86,23 +100,23 @@ const loggedInMenu = async () => {
                 ]);
                 
                 if (postId !== 'cancel') {
-                    const delSpinner = ora('Deleting post...').start();
+                    const delSpinner = ora(theme.text('Deleting post...')).start();
                     try {
                         const { deletePost } = await import('./services/postService.js');
                         await deletePost(postId);
-                        delSpinner.succeed(chalk.green('Post deleted successfully.'));
+                        delSpinner.succeed(theme.success('Post deleted successfully.'));
                     } catch (err) {
-                        delSpinner.fail(chalk.red('Failed to delete post: ' + err.message));
+                        delSpinner.fail(theme.error('Failed to delete post: ' + err.message));
                     }
                 }
                 break;
             }
 
             case 'View/Discuss Post Comments': {
-                const postsSpinner = ora('Fetching posts...').start();
+                const postsSpinner = ora(theme.text('Fetching posts...')).start();
                 const posts = await getPosts();
                 if (posts.length === 0) {
-                    postsSpinner.info(chalk.yellow('There are no posts to discuss.'));
+                    postsSpinner.info(theme.secondary('There are no posts to discuss.'));
                     break;
                 }
                 postsSpinner.stop();
@@ -110,7 +124,7 @@ const loggedInMenu = async () => {
                     name: `${i + 1}. ${post.content.substring(0, 80)}...`,
                     value: post.id,
                 }));
-                const { postId } = await inquirer.prompt([
+                const { postId } = await prompt([
                     {
                         type: 'list',
                         name: 'postId',
@@ -127,19 +141,45 @@ const loggedInMenu = async () => {
                 break;
             }
 
+            case 'Theme Settings': {
+                const availableThemes = getAvailableThemes();
+                const themeChoices = availableThemes.map(t => ({
+                    name: t === theme.current ? `${t} (Current)` : t,
+                    value: t
+                }));
+                themeChoices.push({ name: 'Cancel', value: 'cancel' });
+                
+                const { selectedTheme } = await prompt([
+                    {
+                        type: 'list',
+                        name: 'selectedTheme',
+                        message: 'Select a theme for your terminal:',
+                        choices: themeChoices,
+                    },
+                ]);
+                
+                if (selectedTheme !== 'cancel') {
+                    setTheme(selectedTheme);
+                    console.clear();
+                    displayAsciiArt();
+                    console.log(theme.success(`Theme updated to ${selectedTheme}!`));
+                }
+                break;
+            }
+
             case 'Logout': {
                 await logout();
                 return; // Return to trigger startMenu again
             }
 
             case 'Exit': {
-                console.log(chalk.blue('Goodbye!'));
+                console.log(theme.primary('Goodbye!'));
                 process.exit(0);
                 break;
             }
 
             default: {
-                console.log(chalk.red('Invalid choice. Please try again.'));
+                console.log(theme.error('Invalid choice. Please try again.'));
                 break;
             }
         }
@@ -150,19 +190,20 @@ const startMenu = async () => {
     const choices = ['Login', 'Signup', 'Exit'];
 
     while (true) {
-        const { choice } = await inquirer.prompt([
+        const { choice } = await prompt([
             {
-                type: 'input',
+                type: 'list',
                 name: 'choice',
-                message: `Welcome to Void!\n${choices.map((c, i) => `  ${i + 1}. ${c}`).join('\n')}\n> `,
+                message: 'Welcome to Void CLI!',
+                choices: choices,
             },
         ]);
 
-        const selectedChoice = choices[parseInt(choice, 10) - 1] || '';
+        const selectedChoice = choice;
 
         switch (selectedChoice) {
             case 'Login': {
-                const loginAnswers = await inquirer.prompt([
+                const loginAnswers = await prompt([
                     {
                         type: 'input',
                         name: 'loginIdentifier',
@@ -182,7 +223,7 @@ const startMenu = async () => {
             }
 
             case 'Signup': {
-                const emailAnswer = await inquirer.prompt([
+                const emailAnswer = await prompt([
                     {
                         type: 'input',
                         name: 'email',
@@ -192,23 +233,23 @@ const startMenu = async () => {
 
                 let usernameAnswer;
                 while (true) {
-                    usernameAnswer = await inquirer.prompt([
+                    usernameAnswer = await prompt([
                         {
                             type: 'input',
                             name: 'username',
                             message: 'Username:',
                         },
                     ]);
-                    const usernameSpinner = ora('Checking username...').start();
+                    const usernameSpinner = ora(theme.text('Checking username...')).start();
                     const isUnique = await isUsernameUnique(usernameAnswer.username);
                     if (isUnique) {
                         usernameSpinner.stop();
                         break;
                     }
-                    usernameSpinner.fail(chalk.red('Username is already taken. Please try another.'));
+                    usernameSpinner.fail(theme.error('Username is already taken. Please try another.'));
                 }
 
-                const passwordAnswer = await inquirer.prompt([
+                const passwordAnswer = await prompt([
                     {
                         type: 'password',
                         name: 'password',
@@ -219,9 +260,9 @@ const startMenu = async () => {
                 await signup(emailAnswer.email, passwordAnswer.password, usernameAnswer.username);
 
                 if (auth.currentUser && !auth.currentUser.emailVerified) {
-                    console.log(chalk.yellow('A verification email has been sent. Please check your inbox.'));
+                    console.log(theme.secondary('A verification email has been sent. Please check your inbox.'));
                     while (true) {
-                        const { action } = await inquirer.prompt([
+                        const { action } = await prompt([
                             {
                                 type: 'input',
                                 name: 'action',
@@ -235,11 +276,11 @@ const startMenu = async () => {
 
                         await auth.currentUser.reload();
                         if (auth.currentUser.emailVerified) {
-                            console.log(chalk.green('\nEmail verified successfully! You are now logged in.'));
+                            console.log(theme.success('\nEmail verified successfully! You are now logged in.'));
                             await loggedInMenu();
                             break;
                         } else {
-                            console.log(chalk.red('Email not yet verified. Please check your inbox or spam folder.'));
+                            console.log(theme.error('Email not yet verified. Please check your inbox or spam folder.'));
                         }
                     }
                 } else if (auth.currentUser && auth.currentUser.emailVerified) {
@@ -249,13 +290,13 @@ const startMenu = async () => {
             }
 
             case 'Exit': {
-                console.log(chalk.blue('Goodbye!'));
+                console.log(theme.primary('Goodbye!'));
                 process.exit(0);
                 break;
             }
 
             default: {
-                console.log(chalk.red('Invalid choice. Please try again.'));
+                console.log(theme.error('Invalid choice. Please try again.'));
                 break;
             }
         }
@@ -265,7 +306,7 @@ const startMenu = async () => {
 const autoLogin = async () => {
     const user = await getAutoLoginState();
     if (user && user.emailVerified) {
-        console.log(chalk.cyan(`Found saved session for ${user.email}. Logging in automatically...`));
+        console.log(theme.primary(`Found saved session for ${user.email}. Logging in automatically...`));
         return true;
     }
     return false;
@@ -285,7 +326,7 @@ const main = async () => {
         }
     } catch (error) {
         if (error.name === 'ExitPromptError') {
-            console.log(chalk.blue('\nGoodbye!'));
+            console.log(theme.primary('\nGoodbye!'));
             process.exit(0);
         } else {
             throw error;

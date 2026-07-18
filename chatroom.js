@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { theme } from './utils/theme.js';
 import readline from 'readline';
 import ora from 'ora';
 import {
@@ -18,7 +18,7 @@ const formatMessage = (message) => {
         message.createdAt && message.createdAt.seconds
             ? new Date(message.createdAt.seconds * 1000).toLocaleString()
             : '';
-    return `${chalk.cyan(time)} - ${chalk.yellow(username)}: ${message.text}`;
+    return `${theme.primary(time)} - ${theme.secondary(username)}: ${theme.text(message.text)}`;
 };
 
 /**
@@ -57,7 +57,7 @@ const safePrint = (rl, text) => {
 
     // Redraw the prompt and whatever the user has typed so far
     const currentInput = rl.line || '';
-    process.stdout.write(`${chalk.gray('> ')}${currentInput}`);
+    process.stdout.write(`${theme.dim('> ')}${theme.text(currentInput)}`);
 };
 
 export const enterChatroom = async () => {
@@ -67,7 +67,7 @@ export const enterChatroom = async () => {
     let lastMessageId = null;
     let isOnline = true;
 
-    const spinner = ora('Entering chatroom...').start();
+    const spinner = ora(theme.text('Entering chatroom...')).start();
 
     try {
         const initialSnapshot = await withTimeout(fetchInitialMessages(10), SEND_TIMEOUT_MS);
@@ -76,17 +76,17 @@ export const enterChatroom = async () => {
         const history = initialSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
         spinner.stop();
-        console.log(chalk.green('Welcome to the Chatroom!'));
-        console.log(chalk.gray('--- Last 10 messages ---'));
+        console.log(theme.success('Welcome to the Chatroom!'));
+        console.log(theme.dim('--- Last 10 messages ---'));
         history.forEach((msg) => {
             console.log(formatMessage(msg));
         });
         if (history.length > 0) {
             lastMessageId = history[history.length - 1].id;
         }
-        console.log(chalk.gray("--- You are now in the chat (type 'p' for previous, ':q' to leave) ---"));
+        console.log(theme.dim("--- You are now in the chat (type 'p' for previous, ':q' to leave) ---"));
     } catch (error) {
-        spinner.fail(chalk.red('Failed to enter chatroom: ' + error.message));
+        spinner.fail(theme.error('Failed to enter chatroom: ' + error.message));
         rl.close();
         return;
     }
@@ -95,9 +95,9 @@ export const enterChatroom = async () => {
     const unsubConnection = subscribeToConnectionState((online) => {
         isOnline = online;
         if (online) {
-            safePrint(rl, chalk.green('● Back online'));
+            safePrint(rl, theme.success('● Back online'));
         } else {
-            safePrint(rl, chalk.red('● Connection lost — messages may not send'));
+            safePrint(rl, theme.error('● Connection lost — messages may not send'));
         }
     });
 
@@ -113,7 +113,7 @@ export const enterChatroom = async () => {
     });
 
     const chat = () => {
-        rl.question(chalk.gray('> '), async (line) => {
+        rl.question(theme.dim('> '), async (line) => {
             const input = line.trim().toLowerCase();
 
             if (input === ':q') {
@@ -125,15 +125,15 @@ export const enterChatroom = async () => {
 
             if (input === 'p') {
                 if (!messageCursor) {
-                    safePrint(rl, chalk.yellow('No more messages to load.'));
+                    safePrint(rl, theme.secondary('No more messages to load.'));
                     return chat();
                 }
                 if (totalFetched >= 5000) {
-                    safePrint(rl, chalk.yellow('Reached the limit of 5000 messages.'));
+                    safePrint(rl, theme.secondary('Reached the limit of 5000 messages.'));
                     return chat();
                 }
 
-                const prevSpinner = ora('Loading previous messages...').start();
+                const prevSpinner = ora(theme.text('Loading previous messages...')).start();
                 try {
                     const historySnapshot = await withTimeout(
                         fetchPreviousMessages(messageCursor, 10),
@@ -142,31 +142,31 @@ export const enterChatroom = async () => {
                     prevSpinner.stop();
 
                     if (historySnapshot.empty) {
-                        console.log(chalk.yellow('No more messages to load.'));
+                        console.log(theme.secondary('No more messages to load.'));
                         messageCursor = null;
                     } else {
                         messageCursor = historySnapshot.docs[historySnapshot.docs.length - 1];
                         totalFetched += historySnapshot.docs.length;
                         const olderHistory = historySnapshot.docs.map((doc) => doc.data()).reverse();
-                        console.log(chalk.gray('--- Loaded previous messages ---'));
+                        console.log(theme.dim('--- Loaded previous messages ---'));
                         olderHistory.forEach((msg) => console.log(formatMessage(msg)));
                     }
                 } catch (error) {
-                    prevSpinner.fail(chalk.red('Failed to load previous messages: ' + error.message));
+                    prevSpinner.fail(theme.error('Failed to load previous messages: ' + error.message));
                 }
                 return chat();
             }
 
             if (line.trim() !== '') {
                 if (!isOnline) {
-                    safePrint(rl, chalk.red('⚠ You are offline. Message not sent.'));
+                    safePrint(rl, theme.error('⚠ You are offline. Message not sent.'));
                     return chat();
                 }
                 try {
                     const newMessage = await withTimeout(submitMessage(line.trim()), SEND_TIMEOUT_MS);
                     console.log(formatMessage({ ...newMessage, createdAt: { seconds: Date.now() / 1000 } }));
                 } catch (err) {
-                    console.log(chalk.red('⚠ ' + err.message));
+                    console.log(theme.error('⚠ ' + err.message));
                 }
             }
             chat();
@@ -176,13 +176,13 @@ export const enterChatroom = async () => {
 
     return new Promise((resolve) => {
         rl.on('SIGINT', () => {
-            console.log(chalk.yellow('\nForce quitting chatroom...'));
+            console.log(theme.secondary('\nForce quitting chatroom...'));
             unsubscribe();
             unsubConnection();
             rl.close();
         });
         rl.on('close', () => {
-            console.log(chalk.yellow('Leaving chatroom...'));
+            console.log(theme.secondary('Leaving chatroom...'));
             resolve();
         });
     });

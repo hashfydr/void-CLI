@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { theme } from './utils/theme.js';
 import readline from 'readline';
 import ora from 'ora';
 import { submitComment, fetchComments, subscribeToComments } from './services/commentService.js';
@@ -8,7 +8,7 @@ const SEND_TIMEOUT_MS = 5000;
 const formatComment = (comment) => {
     const username = comment.authorUsername || 'Anonymous';
     const time = comment.createdAt ? new Date(comment.createdAt.seconds * 1000).toLocaleString() : '';
-    return `${chalk.cyan(time)} - ${chalk.yellow(username)}: ${comment.text}`;
+    return `${theme.primary(time)} - ${theme.secondary(username)}: ${theme.text(comment.text)}`;
 };
 
 /**
@@ -39,7 +39,7 @@ const safePrint = (rl, text) => {
     readline.clearLine(process.stdout, 0);
     console.log(text);
     const currentInput = rl.line || '';
-    process.stdout.write(`${chalk.gray('> ')}${currentInput}`);
+    process.stdout.write(`${theme.dim('> ')}${theme.text(currentInput)}`);
 };
 
 export const getComments = fetchComments;
@@ -48,7 +48,7 @@ export const createComment = async (postId, text) => {
     try {
         await withTimeout(submitComment(postId, text), SEND_TIMEOUT_MS);
     } catch (error) {
-        console.log(chalk.red('⚠ ' + error.message));
+        console.log(theme.error('⚠ ' + error.message));
     }
 };
 
@@ -56,7 +56,7 @@ export const enterCommentSession = async (postId) => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
     const displayComments = async () => {
-        const spinner = ora('Loading comments...').start();
+        const spinner = ora(theme.text('Loading comments...')).start();
         try {
             let comments = await withTimeout(fetchComments(postId), SEND_TIMEOUT_MS);
             comments.sort((a, b) => {
@@ -69,13 +69,13 @@ export const enterCommentSession = async (postId) => {
 
             spinner.stop();
             process.stdout.write('\x1Bc'); // Clear screen
-            console.log(chalk.green(`Entering comment session for post ${postId}...`));
-            console.log(chalk.gray("--- You are now in the comment chat (type ':q' to leave) ---"));
+            console.log(theme.success(`Entering comment session for post ${postId}...`));
+            console.log(theme.dim("--- You are now in the comment chat (type ':q' to leave) ---"));
             commentsToDisplay.forEach((msg) => {
                 console.log(formatComment(msg));
             });
         } catch (error) {
-            spinner.fail(chalk.red('Failed to load comments: ' + error.message));
+            spinner.fail(theme.error('Failed to load comments: ' + error.message));
         }
     };
 
@@ -93,7 +93,7 @@ export const enterCommentSession = async (postId) => {
     });
 
     const chat = () => {
-        rl.question(chalk.gray('> '), async (line) => {
+        rl.question(theme.dim('> '), async (line) => {
             const input = line.trim().toLowerCase();
 
             if (input === ':q') {
@@ -112,12 +112,12 @@ export const enterCommentSession = async (postId) => {
 
     return new Promise((resolve) => {
         rl.on('SIGINT', () => {
-            console.log(chalk.yellow('\nForce quitting comment session...'));
+            console.log(theme.secondary('\nForce quitting comment session...'));
             unsubscribe();
             rl.close();
         });
         rl.on('close', () => {
-            console.log(chalk.yellow('Leaving comment session...'));
+            console.log(theme.secondary('Leaving comment session...'));
             unsubscribe();
             resolve();
         });

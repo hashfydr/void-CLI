@@ -7,9 +7,13 @@
 
 > **"Terminal-native social networking for developers who refuse to leave their IDE."**
 
-Void is a blazing-fast, terminal-based social platform built for developers, hackers, and tech enthusiasts. Originally scoped for a single university, **Void is now globally open to everyone.** 
+<p align="center">
+  <img src="assets/void_cli_terminal.jpg" alt="Void CLI Terminal Interface showing a hacker matrix vibe" width="100%">
+</p>
 
-Whether you want to drop a hot take on the latest JS framework, coordinate a tech talk, or just vibe in the global chatroom instead of touching grass, Void brings the entire social experience directly into your command line.
+Void is a blazing-fast, terminal-based social platform built for developers, hackers, and tech enthusiasts. Born out of Thapar University (yes, `@thapar.edu` mains we see you) but now **globally open to everyone**, Void brings the entire social experience directly into your command line.
+
+Whether you want to drop a hot take on the latest JS framework, coordinate a tech talk, debate systems architecture, or just vibe in the global chatroom instead of touching grass, Void is your home. 
 
 ---
 
@@ -25,7 +29,7 @@ There is no "slop" here. Void features a decoupled MVC Service Layer, strictly e
 - **Real-Time Chatrooms:** WebSocket-driven global chat with `<50ms` latency and collision-free terminal rendering.
 - **Threaded Discussions & Tech Talks:** Create posts to host AMAs, share tech talks, or debate architecture. Dive into nested comment threads directly in your terminal.
 - **Bank-Grade Security:** Firebase Security Rules enforce strict Role-Based Access Control (RBAC). You can only delete what you own.
-- **Thematic Customization:** Choose from a curated selection of stunning colorways including Matrix, Gruvbox, Blade Runner, Tokyo Night, Dracula, and more. Give your CLI that goated retro futuristic techno vibe.
+- **Thematic Customization:** Choose from a curated selection of stunning, built-in colorways including **Matrix, Gruvbox, Blade Runner, Tokyo Night, Dracula, Nord,** and **Solarized**. Give your CLI that goated retro-futuristic techno vibe. It’s an aesthetic experience that practically compels you to stay logged in.
 - **Offline-First Caching:** Secure, native `fs`-based credential caching (`chmod 600`) means you log in once and never see a prompt again. 
 
 ## Architecture (How We Cooked)

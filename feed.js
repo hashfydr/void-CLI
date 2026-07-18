@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { theme } from './utils/theme.js';
 import ora from 'ora';
 import { fetchPosts } from './services/feedService.js';
 import { fetchComments } from './services/commentService.js';
@@ -6,12 +6,12 @@ import { fetchComments } from './services/commentService.js';
 export const getPosts = fetchPosts;
 
 export const getFeed = async () => {
-    const spinner = ora('Fetching feed...').start();
+    const spinner = ora(theme.text('Fetching feed...')).start();
     try {
         const posts = await fetchPosts();
 
         if (posts.length === 0) {
-            spinner.info(chalk.yellow('No posts in the feed yet.'));
+            spinner.info(theme.secondary('No posts in the feed yet.'));
             return;
         }
 
@@ -29,17 +29,17 @@ export const getFeed = async () => {
             const username = post.username || 'Anonymous';
             const time = post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleString() : 'No timestamp';
 
-            console.log(`${chalk.yellow(username)} - ${chalk.cyan(time)}\n${chalk.white(post.content)}\n`);
+            console.log(`${theme.secondary(username)} - ${theme.primary(time)}\n${theme.text(post.content)}\n`);
 
             if (post.comments.length > 0) {
-                console.log(chalk.gray('  Comments:'));
+                console.log(theme.dim('  Comments:'));
                 post.comments.forEach((comment) => {
-                    console.log(`    ${chalk.blue(comment.authorUsername || 'Anonymous')}: ${comment.text}`);
+                    console.log(`    ${theme.primary(comment.authorUsername || 'Anonymous')}: ${theme.text(comment.text)}`);
                 });
                 console.log('');
             }
         }
     } catch (error) {
-        spinner.fail(chalk.red('Failed to fetch feed: ' + error.message));
+        spinner.fail(theme.error('Failed to fetch feed: ' + error.message));
     }
 };
