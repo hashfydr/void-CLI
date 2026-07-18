@@ -35,15 +35,15 @@ The application uses a Service Layer architecture. Terminal UI and prompts (`inq
    npm install
    ```
 
-3. Make the script executable and link it globally:
-
-   **For Linux:**
+   **For Linux/macOS:**
+   If you get an EACCES permission error during global install, configure npm to use a local hidden directory:
    ```bash
-   chmod +x index.js
-   npm link
+   mkdir -p ~/.npm-global
+   npm config set prefix '~/.npm-global'
+   echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+   source ~/.bashrc
    ```
-
-   **For macOS:**
+   Then install the CLI:
    ```bash
    chmod +x index.js
    npm link
