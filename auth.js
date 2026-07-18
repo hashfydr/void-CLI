@@ -6,19 +6,35 @@ import ora from 'ora';
 
 export { isUsernameUnique };
 
-export const getAutoLoginState = () => {
-    return new Promise((resolve) => {
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-            unsubscribe();
-            resolve(user);
-        });
-    });
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+
+const credentialsPath = path.join(os.homedir(), '.void-cli-credentials.json');
+
+export const getAutoLoginState = async () => {
+    try {
+        if (fs.existsSync(credentialsPath)) {
+            const data = fs.readFileSync(credentialsPath, 'utf8');
+            const { identifier, password } = JSON.parse(data);
+            const user = await loginUser(identifier, password);
+            return user;
+        }
+    } catch (e) {
+        // If anything fails, delete the corrupted/invalid credentials
+        if (fs.existsSync(credentialsPath)) {
+            fs.unlinkSync(credentialsPath);
+        }
+    }
+    return null;
 };
 
 export const login = async (loginIdentifier, password, silent = false) => {
     const spinner = silent ? null : ora('Logging in...').start();
     try {
         await loginUser(loginIdentifier, password);
+        // Save credentials securely with 0600 permissions (only owner can read/write)
+        fs.writeFileSync(credentialsPath, JSON.stringify({ identifier: loginIdentifier, password }), { mode: 0o600 });
         if (spinner) spinner.succeed(chalk.green('Login successful!'));
         return true;
     } catch (error) {
@@ -65,6 +81,9 @@ export const logout = async () => {
     const spinner = ora('Logging out...').start();
     try {
         await logoutUser();
+        if (fs.existsSync(credentialsPath)) {
+            fs.unlinkSync(credentialsPath);
+        }
         spinner.succeed(chalk.green('Logged out successfully!'));
     } catch (error) {
         spinner.fail(chalk.red('Logout failed: ' + error.message));

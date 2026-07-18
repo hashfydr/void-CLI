@@ -1,6 +1,6 @@
 // Import Firebase SDK
 import { initializeApp } from 'firebase/app';
-import { initializeAuth, browserLocalPersistence } from 'firebase/auth';
+import { initializeAuth, inMemoryPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 // Your Firebase configuration
@@ -22,7 +22,7 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize services
 export const auth = initializeAuth(app, {
-    persistence: browserLocalPersistence
+    persistence: inMemoryPersistence
 });
 export const db = getFirestore(app);
 
