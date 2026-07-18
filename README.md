@@ -35,20 +35,7 @@ The application uses a Service Layer architecture. Terminal UI and prompts (`inq
    npm install
    ```
 
-3. Setup environment variables:
-   Create a `.env` file in the root directory and add your Firebase credentials:
-   ```env
-   FIREBASE_API_KEY=your_api_key
-   FIREBASE_AUTH_DOMAIN=your_auth_domain
-   FIREBASE_DATABASE_URL=your_database_url
-   FIREBASE_PROJECT_ID=your_project_id
-   FIREBASE_STORAGE_BUCKET=your_storage_bucket
-   FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   FIREBASE_APP_ID=your_app_id
-   FIREBASE_MEASUREMENT_ID=your_measurement_id
-   ```
-
-4. Make the script executable and link it globally:
+3. Make the script executable and link it globally:
 
    **For Linux:**
    ```bash
