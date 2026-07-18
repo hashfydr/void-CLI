@@ -49,6 +49,7 @@ const loggedInMenu = async () => {
                         type: 'input',
                         name: 'content',
                         message: 'What do you want to post?',
+                        validate: input => input.trim().length > 0 ? true : 'Post cannot be empty.'
                     },
                 ]);
                 await createPost(content);
