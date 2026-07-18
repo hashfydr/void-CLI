@@ -7,9 +7,6 @@
 
 > **"Terminal-native social networking for developers who refuse to leave their IDE."**
 
-<p align="center">
-  <img src="assets/void_cli_terminal.jpg" alt="Void CLI Terminal Interface showing a hacker matrix vibe" width="100%">
-</p>
 
 Void is a blazing-fast, terminal-based social platform built for developers, hackers, and tech enthusiasts. Born out of Thapar University (yes, `@thapar.edu` mains we see you) but now **globally open to everyone**, Void brings the entire social experience directly into your command line.
 
@@ -29,8 +26,9 @@ There is no "slop" here. Void features a decoupled MVC Service Layer, strictly e
 - **Real-Time Chatrooms:** WebSocket-driven global chat with `<50ms` latency and collision-free terminal rendering.
 - **Threaded Discussions & Tech Talks:** Create posts to host AMAs, share tech talks, or debate architecture. Dive into nested comment threads directly in your terminal.
 - **Bank-Grade Security:** Firebase Security Rules enforce strict Role-Based Access Control (RBAC). You can only delete what you own.
-- **Thematic Customization:** Choose from a curated selection of stunning, built-in colorways including **Matrix, Gruvbox, Blade Runner, Tokyo Night, Dracula, Nord,** and **Solarized**. Give your CLI that goated retro-futuristic techno vibe. It’s an aesthetic experience that practically compels you to stay logged in.
+- **Thematic Customization:** Choose from a curated selection of stunning, globally-loved developer colorways including **Matrix, Gruvbox, Rosé Pine, Dracula, SynthWave '84, Catppuccin Mocha, Monokai Pro,** and **Cyberpunk**. The entire terminal background morphs instantly to match. Give your CLI that goated retro-futuristic techno vibe. It’s an aesthetic experience that practically compels you to stay logged in.
 - **Offline-First Caching:** Secure, native `fs`-based credential caching (`chmod 600`) means you log in once and never see a prompt again. 
+
 
 ## Architecture (How We Cooked)
 
@@ -38,6 +36,18 @@ To ensure this app scales without burning through Firebase quotas, Void implemen
 1. **Service Layer Pattern:** Terminal UI logic (`inquirer`, `chalk`, `ora`) is completely decoupled from database queries (`firebase`), ensuring a clean separation of concerns.
 2. **Cursor-Based Pagination:** Instead of fetching the entire database, feeds and chatrooms load up to 5,000 messages dynamically in optimized chunks.
 3. **Parallelized Fetching:** Comments and metadata are fetched using `Promise.all` to completely eliminate N+1 query latency.
+
+---
+
+## Screenshots
+
+<p align="center">
+  <img src="1.png" alt="Screenshot 1" width="100%">
+  <img src="2.png" alt="Screenshot 2" width="100%">
+  <img src="3.png" alt="Screenshot 3" width="100%">
+  <img src="4.png" alt="Screenshot 4" width="100%">
+  <img src="5.png" alt="Screenshot 5" width="100%">
+</p>
 
 ---
 

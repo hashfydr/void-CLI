@@ -306,7 +306,7 @@ const startMenu = async () => {
 const autoLogin = async () => {
     const user = await getAutoLoginState();
     if (user && user.emailVerified) {
-        console.log(theme.primary(`Found saved session for ${user.email}. Logging in automatically...`));
+
         return true;
     }
     return false;
