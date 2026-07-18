@@ -61,7 +61,7 @@ const loggedInMenu = async () => {
                 const posts = await getPosts();
                 
                 // Filter posts that the user is allowed to delete
-                const isModerator = auth.currentUser?.email === 'hgarg1_be24@thapar.edu';
+                const isModerator = auth.currentUser?.email === 'adonisbeing@gmail.com';
                 const deletablePosts = posts.filter(p => isModerator || p.author === auth.currentUser.uid);
                 
                 if (deletablePosts.length === 0) {

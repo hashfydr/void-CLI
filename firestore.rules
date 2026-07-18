@@ -18,7 +18,7 @@ service cloud.firestore {
     }
 
     function isModerator() {
-      return isAuthenticated() && request.auth.token.email == 'hgarg1_be24@thapar.edu';
+      return isAuthenticated() && request.auth.token.email == 'adonisbeing@gmail.com';
     }
 
     // ─── Users Collection ───────────────────────────────────────
